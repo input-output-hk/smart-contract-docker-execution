@@ -53,6 +53,8 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
+    "@types/dockerode": "^2.5.12",
+    "dockerode": "^2.5.8",
     "dotenv": "^6.2.0"
   }
 }
