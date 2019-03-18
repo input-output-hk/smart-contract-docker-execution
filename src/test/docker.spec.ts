@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { loadContainer, initializeDockerClient, unloadContainer } from '../lib/docker'
 import { readFileSync } from 'fs'
 import axios from 'axios'
-const executable = readFileSync(`${__dirname}/../util/http_server/http_server_base64.txt`)
+const executable = readFileSync(`${__dirname}/../../util/http_server/http_server_base64.txt`)
 
 describe('dockerInteractions', () => {
   afterEach(async () => {
