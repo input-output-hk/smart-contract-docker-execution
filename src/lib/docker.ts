@@ -6,13 +6,12 @@ export function initializeDockerClient() {
   return new Docker({ socketPath: '/var/run/docker.sock' })
 }
 
-export async function isContainerRunning(contractAddress: string): Promise<boolean> {
+export async function findContainerId(contractAddress: string): Promise<{ containerId: string }> {
   const docker = initializeDockerClient()
-  const container = docker.getContainer(contractAddress)
-
-  return container.inspect()
-    .then(() => true)
-    .catch(() => false)
+  const containers = await docker.listContainers()
+  const targetContainer = containers.find((container) => container.Names[0] === `/${contractAddress}`)
+  if (!targetContainer) return { containerId: '' }
+  return { containerId: targetContainer.Id }
 }
 
 export async function buildImage(dockerfileRelativePath: string, imageName: string) {
@@ -63,10 +62,11 @@ export async function createContainer({ contractAddress, lowerPortBound, upperPo
   const [freePort] = await fp(lowerPortBound, upperPortBound)
   const containerOpts: any = {
     Image: `i-${contractAddress}`,
-    ExposedPorts: { [`${freePort}/tcp`]: {} },
-    PortBindings: { '8000/tcp': [{ 'HostPort': freePort }] },
+    name: contractAddress,
+    ExposedPorts: { [`8000/tcp`]: {} },
     HostConfig: {
       AutoRemove: true,
+      PortBindings: { '8000/tcp': [{ 'HostPort': `${freePort}` }] },
     }
   }
 
@@ -76,7 +76,7 @@ export async function createContainer({ contractAddress, lowerPortBound, upperPo
 }
 
 export async function loadContainer({ executable, contractAddress, lowerPortBound, upperPortBound }: { executable: string, contractAddress: string, lowerPortBound: number, upperPortBound: number }): Promise<{ port: number }> {
-  const containerRunning = await isContainerRunning(contractAddress)
+  const containerRunning = (await findContainerId(contractAddress)).containerId
   if (containerRunning) return
 
   const executablePath = `${__dirname}/${contractAddress}`
@@ -87,4 +87,14 @@ export async function loadContainer({ executable, contractAddress, lowerPortBoun
   await writeDockerfile(relativeExecutablePath)
   await buildImage(relativeDockerfilePath, `i-${contractAddress}`)
   return createContainer({ contractAddress, lowerPortBound, upperPortBound })
+}
+
+export async function unloadContainer(contractAddress: string) {
+  const { containerId } = await findContainerId(contractAddress)
+  if (!containerId) return
+
+  const docker = initializeDockerClient()
+
+  // The use of stop vs kill will depend on whether the binary has graceful handling of SIGINT
+  return docker.getContainer(containerId).kill()
 }
