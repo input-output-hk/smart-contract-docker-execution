@@ -55,6 +55,7 @@
   "dependencies": {
     "@types/dockerode": "^2.5.12",
     "dockerode": "^2.5.8",
-    "dotenv": "^6.2.0"
+    "dotenv": "^6.2.0",
+    "find-free-port": "^2.0.0"
   }
 }

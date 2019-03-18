@@ -1,5 +1,6 @@
 import * as Docker from 'dockerode'
 import { writeFile } from 'fs'
+const fp = require("find-free-port")
 
 export function initializeDockerClient() {
   return new Docker({ socketPath: '/var/run/docker.sock' })
@@ -14,12 +15,8 @@ export async function isContainerRunning(contractAddress: string): Promise<boole
     .catch(() => false)
 }
 
-// TODO: Call this on application boot such that we can guarantee its existence
-export async function buildImage(dockerfilePath: string, imageName: string) {
+export async function buildImage(dockerfileRelativePath: string, imageName: string) {
   const docker = initializeDockerClient()
-
-  // TODO: Make more robust
-  const dockerfileRelativePath = dockerfilePath.split('smart-contract-docker-execution')[1]
 
   const buildOpts: any = {
     context: `${__dirname}/../..`,
@@ -61,17 +58,7 @@ export function writeDockerfile(executablePath: string) {
   })
 }
 
-export async function loadContainer(executable: string, contractAddress: string) {
-  const containerRunning = await isContainerRunning(contractAddress)
-  if (containerRunning) return
-
-  const executablePath = `${__dirname}/${contractAddress}`
-  const relativeExecutablePath = `dist/lib/${contractAddress}`
-
-  await writeExecutable(executable, executablePath)
-  await writeDockerfile(relativeExecutablePath)
-  await buildImage(`${executablePath}-Dockerfile`, `i-${contractAddress}`)
-
+export async function createContainer(contractAddress: string, lowerPortBound: number, upperPortBound: number) {
   const docker = initializeDockerClient()
   const containerOpts: any = {
     Image: `i-${contractAddress}`,
@@ -84,4 +71,18 @@ export async function loadContainer(executable: string, contractAddress: string)
 
   const container = await docker.createContainer(containerOpts)
   return container.start()
+}
+
+export async function loadContainer(executable: string, contractAddress: string): Promise<{ port: number }> {
+  const containerRunning = await isContainerRunning(contractAddress)
+  if (containerRunning) return
+
+  const executablePath = `${__dirname}/${contractAddress}`
+  const relativeExecutablePath = `dist/lib/${contractAddress}`
+  const relativeDockerfilePath = `dist/lib/${contractAddress}-Dockerfile`
+
+  await writeExecutable(executable, executablePath)
+  await writeDockerfile(relativeExecutablePath)
+  await buildImage(relativeDockerfilePath, `i-${contractAddress}`)
+  return createContainer(contractAddress)
 }
