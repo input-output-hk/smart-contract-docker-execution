@@ -11,7 +11,7 @@ describe('dockerApi', () => {
     await Promise.all(containers.map(container => docker.getContainer(container.Id).kill()))
   })
 
-  describe('load', () => {
+  describe('loadContainer', () => {
     it('successfully boots a container that accepts HTTP on the returned port', async () => {
       const { port } = await loadContainer({ executable: executable.toString(), contractAddress: 'abcd', lowerPortBound: 10000, upperPortBound: 11000 })
 
@@ -33,8 +33,8 @@ describe('dockerApi', () => {
     })
   })
 
-  describe('unload', () => {
-    it('successfully terminates an instance for an address', async () => {
+  describe('unloadContainer', () => {
+    it('successfully terminates a contract instance for an address', async () => {
       await loadContainer({ executable: executable.toString(), contractAddress: 'abcd', lowerPortBound: 10000, upperPortBound: 11000 })
       await unloadContainer('abcd')
 
@@ -43,7 +43,7 @@ describe('dockerApi', () => {
       expect(containers.length).to.eql(0)
     })
 
-    it('resolves successfully if an instance for an address not exist', async () => {
+    it('resolves successfully if a contract instance for an address not exist', async () => {
       await unloadContainer('abcd')
 
       const docker = initializeDockerClient()
