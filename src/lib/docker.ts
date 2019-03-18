@@ -58,22 +58,24 @@ export function writeDockerfile(executablePath: string) {
   })
 }
 
-export async function createContainer(contractAddress: string, lowerPortBound: number, upperPortBound: number) {
+export async function createContainer({ contractAddress, lowerPortBound, upperPortBound }: { contractAddress: string, lowerPortBound: number, upperPortBound: number }) {
   const docker = initializeDockerClient()
+  const [freePort] = await fp(lowerPortBound, upperPortBound)
   const containerOpts: any = {
     Image: `i-${contractAddress}`,
-    ExposedPorts: { '3333/tcp': {} },
-    PortBindings: { '8000/tcp': [{ 'HostPort': '3333' }] },
+    ExposedPorts: { [`${freePort}/tcp`]: {} },
+    PortBindings: { '8000/tcp': [{ 'HostPort': freePort }] },
     HostConfig: {
       AutoRemove: true,
     }
   }
 
   const container = await docker.createContainer(containerOpts)
-  return container.start()
+  await container.start()
+  return { port: freePort }
 }
 
-export async function loadContainer(executable: string, contractAddress: string): Promise<{ port: number }> {
+export async function loadContainer({ executable, contractAddress, lowerPortBound, upperPortBound }: { executable: string, contractAddress: string, lowerPortBound: number, upperPortBound: number }): Promise<{ port: number }> {
   const containerRunning = await isContainerRunning(contractAddress)
   if (containerRunning) return
 
@@ -84,5 +86,5 @@ export async function loadContainer(executable: string, contractAddress: string)
   await writeExecutable(executable, executablePath)
   await writeDockerfile(relativeExecutablePath)
   await buildImage(relativeDockerfilePath, `i-${contractAddress}`)
-  return createContainer(contractAddress)
+  return createContainer({ contractAddress, lowerPortBound, upperPortBound })
 }
