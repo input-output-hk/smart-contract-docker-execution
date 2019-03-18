@@ -10,8 +10,8 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint --fix \"src/**/*.ts\"",
     "start": "npm run build && node -r dotenv/config dist/index.js",
-    "test": "npm run lint && ts-mocha --exit \"src/**/*.spec.ts\"",
-    "test:watch": "ts-mocha -w --exit \"src/**/*.spec.ts\""
+    "test": "npm run lint && tsc && mocha --exit \"dist/**/*.spec.js\"",
+    "test:watch": "mocha -w --exit \"dist/**/*.spec.js\""
   },
   "repository": {
     "type": "git",
@@ -53,6 +53,11 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "dotenv": "^6.2.0"
+    "@types/axios": "^0.14.0",
+    "@types/dockerode": "^2.5.12",
+    "axios": "^0.18.0",
+    "dockerode": "^2.5.8",
+    "dotenv": "^6.2.0",
+    "find-free-port": "^2.0.0"
   }
 }
