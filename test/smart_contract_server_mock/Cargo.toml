@@ -1,5 +1,5 @@
 [package]
-name = "http_server"
+name = "smart_contract_server"
 version = "0.1.0"
 authors = ["sam <sam.jeston@iohk.io>"]
 edition = "2018"
