@@ -1,7 +1,5 @@
 import * as Docker from 'dockerode'
-import { writeFile, chmod } from 'fs'
-
-const BASE_IMAGE = 'plutus-base-execution-runtime'
+import { writeFile } from 'fs'
 
 export function initializeDockerClient() {
   return new Docker({ socketPath: '/var/run/docker.sock' })
@@ -17,14 +15,18 @@ export async function isContainerRunning(contractAddress: string): Promise<boole
 }
 
 // TODO: Call this on application boot such that we can guarantee its existence
-export async function buildImage() {
+export async function buildImage(dockerfilePath: string, imageName: string) {
   const docker = initializeDockerClient()
+
+  // TODO: Make more robust
+  const dockerfileRelativePath = dockerfilePath.split('smart-contract-docker-execution')[1]
+
   const buildOpts: any = {
     context: `${__dirname}/../..`,
-    src: [`DockerfileContracts`]
+    src: [dockerfileRelativePath, 'dist']
   }
 
-  let stream = await docker.buildImage(buildOpts, { t: BASE_IMAGE, dockerfile: 'DockerfileContracts' })
+  let stream = await docker.buildImage(buildOpts, { t: imageName, dockerfile: dockerfileRelativePath })
 
   return new Promise((resolve, reject) => {
     docker.modem.followProgress(stream, (err: any, res: any) => err ? reject(err) : resolve(res));
@@ -37,12 +39,24 @@ export function writeExecutable(executable: string, executablePath: string) {
   return new Promise((resolve, reject) => {
     writeFile(executablePath, executableData, (error) => {
       if (error) return reject(error)
+      resolve()
+    })
+  })
+}
 
-      // TODO: Remove this hack, actually sort out the permission with docker
-      chmod(executablePath, '777', (error) => {
-        if (error) return reject(error)
-        resolve()
-      })
+export function writeDockerfile(executablePath: string) {
+  const dockerfile = `
+    FROM ubuntu:18.04
+    RUN ["mkdir", "/plutus"]
+    COPY ${executablePath} /plutus/executable
+    RUN chmod +x /plutus/executable
+    CMD /plutus/executable
+  `
+
+  return new Promise((resolve, reject) => {
+    writeFile(`${executablePath}-Dockerfile`, dockerfile, (error) => {
+      if (error) return reject(error)
+      resolve()
     })
   })
 }
@@ -52,26 +66,22 @@ export async function loadContainer(executable: string, contractAddress: string)
   if (containerRunning) return
 
   const executablePath = `${__dirname}/${contractAddress}`
-  await writeExecutable(executable, executablePath)
+  const relativeExecutablePath = `dist/lib/${contractAddress}`
 
-  // 2. Start the container, with a volume to the executable on the fs [need to manage port mappings]
+  await writeExecutable(executable, executablePath)
+  await writeDockerfile(relativeExecutablePath)
+  await buildImage(`${executablePath}-Dockerfile`, `i-${contractAddress}`)
+
   const docker = initializeDockerClient()
   const containerOpts: any = {
-    Image: BASE_IMAGE,
+    Image: `i-${contractAddress}`,
     ExposedPorts: { '3333/tcp': {} },
     PortBindings: { '8000/tcp': [{ 'HostPort': '3333' }] },
     HostConfig: {
       AutoRemove: true,
-      Binds: [
-        `${executablePath}:/plutus/executable`
-      ]
     }
   }
 
   const container = await docker.createContainer(containerOpts)
-  container.attach({ stream: true, stdout: true, stderr: true }, function (_, stream) {
-    stream.pipe(process.stdout);
-  })
-
   return container.start()
 }
