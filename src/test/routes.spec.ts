@@ -3,7 +3,7 @@ import { bootApi } from '../lib/routes'
 import * as request from 'supertest'
 import { Server } from 'http'
 import { readFileSync } from 'fs'
-import { loadContainer, initializeDockerClient, findContainerId } from '../lib/docker-api';
+import { loadContainer, initializeDockerClient, findContainerId } from '../lib/docker-api'
 const executable = readFileSync(`${__dirname}/../../test/smart_contract_server_mock/smart_contract_server_base64.txt`)
 
 describe('api', () => {

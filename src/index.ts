@@ -1,5 +1,5 @@
-const { API_PORT, LOWER_PORT_BOUND, UPPER_PORT_BOUND } = process.env
 import { bootApi } from './lib/routes'
+const { API_PORT, LOWER_PORT_BOUND, UPPER_PORT_BOUND } = process.env
 
 bootApi({
   port: Number(API_PORT),

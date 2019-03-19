@@ -3,7 +3,7 @@ import { findContainerPort, loadContainer, unloadContainer } from './docker-api'
 import * as bodyParser from 'body-parser'
 import axios from 'axios'
 
-export function bootApi({ port, lowerPortBound, upperPortBound }: { port: number, lowerPortBound: number, upperPortBound: number }) {
+export function bootApi ({ port, lowerPortBound, upperPortBound }: { port: number, lowerPortBound: number, upperPortBound: number }) {
   const app = express()
   app.use(bodyParser.json({ limit: '50mb' }))
 
