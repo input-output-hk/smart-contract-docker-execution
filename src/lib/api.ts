@@ -3,7 +3,7 @@ import { findContainerPort, loadContainer, unloadContainer } from './docker-api'
 import * as bodyParser from 'body-parser'
 import axios from 'axios'
 
-export function configureApi({ port, lowerPortBound, upperPortBound }: { port: number, lowerPortBound: number, upperPortBound: number }) {
+export function configureApi ({ port, lowerPortBound, upperPortBound }: { port: number, lowerPortBound: number, upperPortBound: number }) {
   const app = express()
   app.use(bodyParser.json({ limit: '50mb' }))
 
@@ -54,7 +54,7 @@ export function configureApi({ port, lowerPortBound, upperPortBound }: { port: n
   return app.listen(port)
 }
 
-export function bootApi() {
+export function bootApi () {
   const { API_PORT, CONTAINER_LOWER_PORT_BOUND, CONTAINER_UPPER_PORT_BOUND } = process.env
 
   if (!API_PORT || !CONTAINER_LOWER_PORT_BOUND || !CONTAINER_UPPER_PORT_BOUND) {
