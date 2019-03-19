@@ -32,11 +32,13 @@
   },
   "homepage": "https://github.com/input-output-hk/smart-contract-docker-execution#readme",
   "devDependencies": {
+    "@types/body-parser": "^1.17.0",
     "@types/chai": "^4.1.7",
     "@types/chai-as-promised": "^7.1.0",
     "@types/expect": "^1.20.4",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.11.1",
+    "@types/supertest": "^2.0.7",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
@@ -49,15 +51,19 @@
     "mocha": "^6.0.2",
     "nodemon": "^1.18.10",
     "sinon": "^7.2.7",
+    "supertest": "^4.0.2",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.3333"
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
     "@types/dockerode": "^2.5.12",
+    "@types/express": "^4.16.1",
     "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
     "dockerode": "^2.5.8",
     "dotenv": "^6.2.0",
+    "express": "^4.16.4",
     "find-free-port": "^2.0.0"
   }
 }
