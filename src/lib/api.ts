@@ -3,7 +3,7 @@ import { findContainerPort, loadContainer, unloadContainer } from './docker-api'
 import * as bodyParser from 'body-parser'
 import axios from 'axios'
 
-export function configureApi ({ port, lowerPortBound, upperPortBound }: { port: number, lowerPortBound: number, upperPortBound: number }) {
+export function configureApi({ port, lowerPortBound, upperPortBound }: { port: number, lowerPortBound: number, upperPortBound: number }) {
   const app = express()
   app.use(bodyParser.json({ limit: '50mb' }))
 
@@ -54,17 +54,17 @@ export function configureApi ({ port, lowerPortBound, upperPortBound }: { port: 
   return app.listen(port)
 }
 
-export function bootApi () {
-  const { API_PORT, LOWER_PORT_BOUND, UPPER_PORT_BOUND } = process.env
+export function bootApi() {
+  const { API_PORT, CONTAINER_LOWER_PORT_BOUND, CONTAINER_UPPER_PORT_BOUND } = process.env
 
-  if (!API_PORT || !LOWER_PORT_BOUND || !UPPER_PORT_BOUND) {
+  if (!API_PORT || !CONTAINER_LOWER_PORT_BOUND || !CONTAINER_UPPER_PORT_BOUND) {
     throw new Error('Missing environment config')
   }
 
   configureApi({
     port: Number(API_PORT),
-    lowerPortBound: Number(LOWER_PORT_BOUND),
-    upperPortBound: Number(UPPER_PORT_BOUND)
+    lowerPortBound: Number(CONTAINER_LOWER_PORT_BOUND),
+    upperPortBound: Number(CONTAINER_UPPER_PORT_BOUND)
   })
 
   console.log(`Smart Contract Docker Engine listening on Port ${API_PORT}`)
