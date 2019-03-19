@@ -39,7 +39,7 @@ export function configureApi ({ port, lowerPortBound, upperPortBound }: { port: 
       return res.status(400).json({ error: 'Container not initialized. Call /loadContainer and try again' })
     }
 
-    const result = await axios.post(`http://0.0.0.0:${associatedPort}`, {
+    const result = await axios.post(`http://localhost:${associatedPort}`, {
       method,
       method_arguments: methodArguments
     })
