@@ -1,5 +1,5 @@
 import * as Docker from 'dockerode'
-import { writeFile } from 'fs'
+import { writeFile, unlink } from 'fs'
 const fp = require('find-free-port')
 
 export function initializeDockerClient () {
@@ -51,6 +51,15 @@ export function writeExecutable (executable: string, executablePath: string) {
   })
 }
 
+export function removeExecutable (executablePath: string) {
+  return new Promise((resolve, reject) => {
+    unlink(executablePath, (error) => {
+      if (error) return reject(error)
+      resolve()
+    })
+  })
+}
+
 export function writeDockerfile (executablePath: string) {
   const dockerfile = `
     FROM ubuntu:18.04
@@ -96,6 +105,7 @@ export async function loadContainer ({ executable, contractAddress, lowerPortBou
 
   await writeExecutable(executable, executablePath)
   await writeDockerfile(relativeExecutablePath)
+  await removeExecutable(executablePath)
   await buildImage(relativeDockerfilePath, `i-${contractAddress}`)
   return createContainer({ contractAddress, lowerPortBound, upperPortBound })
 }

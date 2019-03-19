@@ -10,8 +10,9 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint --fix \"src/**/*.ts\"",
     "start": "npm run build && node -r dotenv/config dist/index.js",
-    "test": "npm run lint && tsc && mocha --exit --timeout 5000 \"dist/**/*.spec.js\"",
-    "test:watch": "mocha -w --timeout 5000 \"dist/**/*.spec.js\""
+    "test": "npm run lint && tsc && nyc mocha",
+    "test:watch": "mocha -w",
+    "test:coverage": "npm test && http-server coverage"
   },
   "repository": {
     "type": "git",
@@ -48,9 +49,12 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "http-server": "^0.11.1",
     "mocha": "^6.0.2",
     "nodemon": "^1.18.10",
+    "nyc": "^13.3.0",
     "sinon": "^7.2.7",
+    "source-map-support": "^0.5.11",
     "supertest": "^4.0.2",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.3333"
@@ -65,5 +69,20 @@
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
     "find-free-port": "^2.0.0"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.spec.ts"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
   }
 }

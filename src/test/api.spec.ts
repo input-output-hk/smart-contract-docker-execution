@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { bootApi } from '../lib/routes'
+import { configureApi, bootApi } from '../lib/api'
 import * as request from 'supertest'
 import { Server } from 'http'
 import { readFileSync } from 'fs'
@@ -10,7 +10,7 @@ describe('api', () => {
   let app: Server
 
   beforeEach(async () => {
-    app = await bootApi({ port: 4111, lowerPortBound: 4200, upperPortBound: 4300 })
+    app = await configureApi({ port: 4111, lowerPortBound: 4200, upperPortBound: 4300 })
   })
 
   afterEach(async () => {
@@ -18,6 +18,12 @@ describe('api', () => {
     const docker = initializeDockerClient()
     const containers = await docker.listContainers()
     await Promise.all(containers.map(container => docker.getContainer(container.Id).kill()))
+  })
+
+  describe('bootApi', () => {
+    it('throws an error when env config is missing', () => {
+      expect(() => bootApi()).to.throw(/Missing environment config/)
+    })
   })
 
   describe('/loadContainer', () => {
