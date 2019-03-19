@@ -1,3 +1,10 @@
-const { API_PORT } = process.env
+const { API_PORT, LOWER_PORT_BOUND, UPPER_PORT_BOUND } = process.env
 import { bootApi } from './lib/routes'
-bootApi(Number(API_PORT))
+
+bootApi({
+  port: Number(API_PORT),
+  lowerPortBound: Number(LOWER_PORT_BOUND),
+  upperPortBound: Number(UPPER_PORT_BOUND)
+})
+
+console.log(`Smart Contract Docker Engine listening on Port ${API_PORT}`)
