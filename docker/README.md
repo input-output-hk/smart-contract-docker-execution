@@ -1,1 +1,1 @@
-Constrained build location for auto-generated dockerfiles and decoded binaries.
+This directory is the target location for auto-generated dockerfiles and decoded binaries.
