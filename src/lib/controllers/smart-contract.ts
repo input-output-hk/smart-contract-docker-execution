@@ -6,12 +6,12 @@ import {
   findContainerPort
 } from '../docker-api'
 
-interface LoadContainerRequest {
+interface LoadSmartContractRequest {
   contractAddress: string
   executable: string
 }
 
-interface UnloadContainerRequest {
+interface UnloadSmartContractRequest {
   contractAddress: string
 }
 
@@ -27,7 +27,7 @@ type SmartContractResponse = any
 export class ContainerController extends Controller {
   @SuccessResponse('204', 'No Content')
   @Post('loadSmartContract')
-  public async loadSmartContract (@Body() { contractAddress, executable }: LoadContainerRequest): Promise<void> {
+  public async loadSmartContract (@Body() { contractAddress, executable }: LoadSmartContractRequest): Promise<void> {
     const { CONTAINER_LOWER_PORT_BOUND, CONTAINER_UPPER_PORT_BOUND } = process.env
     this.setStatus(204)
     await loadContainer({
@@ -40,7 +40,7 @@ export class ContainerController extends Controller {
 
   @SuccessResponse('204', 'No Content')
   @Post('unloadSmartContract')
-  public async unloadSmartContract (@Body() { contractAddress }: UnloadContainerRequest): Promise<void> {
+  public async unloadSmartContract (@Body() { contractAddress }: UnloadSmartContractRequest): Promise<void> {
     this.setStatus(204)
     await unloadContainer(contractAddress)
   }
