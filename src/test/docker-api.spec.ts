@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { loadContainer, initializeDockerClient, unloadContainer } from '../lib/docker-api'
+import { loadContainer, initializeDockerClient, unloadContainer } from '../docker-api'
 import axios from 'axios'
 import { readFileSync } from 'fs'
 const executable = readFileSync(`${__dirname}/../../test/smart_contract_server_mock/smart_contract_server_base64.txt`)

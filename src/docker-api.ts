@@ -1,5 +1,5 @@
 import * as Docker from 'dockerode'
-import { writeFile } from 'fs'
+import { writeFile, unlink } from 'fs'
 const fp = require('find-free-port')
 
 export function initializeDockerClient () {
@@ -14,12 +14,23 @@ export async function findContainerId (contractAddress: string): Promise<{ conta
   return { containerId: targetContainer.Id }
 }
 
+export async function findContainerPort (contractAddress: string): Promise<number> {
+  const { containerId } = await findContainerId(contractAddress)
+  if (!containerId) return 0
+
+  const docker = initializeDockerClient()
+  const container = docker.getContainer(containerId)
+  const portInspection = (await container.inspect()).HostConfig.PortBindings
+  const portMappings: any = Object.values(portInspection)[0]
+  return Number(portMappings[0].HostPort)
+}
+
 export async function buildImage (dockerfileRelativePath: string, imageName: string) {
   const docker = initializeDockerClient()
 
   const buildOpts: any = {
-    context: `${__dirname}/../..`,
-    src: [dockerfileRelativePath, 'dist']
+    context: `${__dirname}/..`,
+    src: ['docker']
   }
 
   let stream = await docker.buildImage(buildOpts, { t: imageName, dockerfile: dockerfileRelativePath })
@@ -34,6 +45,15 @@ export function writeExecutable (executable: string, executablePath: string) {
 
   return new Promise((resolve, reject) => {
     writeFile(executablePath, executableData, (error) => {
+      if (error) return reject(error)
+      resolve()
+    })
+  })
+}
+
+export function removeExecutable (executablePath: string) {
+  return new Promise((resolve, reject) => {
+    unlink(executablePath, (error) => {
       if (error) return reject(error)
       resolve()
     })
@@ -79,13 +99,13 @@ export async function loadContainer ({ executable, contractAddress, lowerPortBou
   const containerRunning = (await findContainerId(contractAddress)).containerId
   if (containerRunning) return
 
-  const executablePath = `${__dirname}/${contractAddress}`
-  const relativeExecutablePath = `dist/lib/${contractAddress}`
-  const relativeDockerfilePath = `dist/lib/${contractAddress}-Dockerfile`
+  const relativeExecutablePath = `docker/${contractAddress}`
+  const relativeDockerfilePath = `${relativeExecutablePath}-Dockerfile`
 
-  await writeExecutable(executable, executablePath)
+  await writeExecutable(executable, relativeExecutablePath)
   await writeDockerfile(relativeExecutablePath)
   await buildImage(relativeDockerfilePath, `i-${contractAddress}`)
+  await removeExecutable(relativeExecutablePath)
   return createContainer({ contractAddress, lowerPortBound, upperPortBound })
 }
 
