@@ -10,7 +10,9 @@ describe('api', () => {
   let app: Server
 
   beforeEach(async () => {
-    app = await configureApi({ port: 4111, lowerPortBound: 4200, upperPortBound: 4300 })
+    process.env.CONTAINER_LOWER_PORT_BOUND = '4200'
+    process.env.CONTAINER_UPPER_PORT_BOUND = '4300'
+    app = await configureApi({ port: 4111 })
   })
 
   afterEach(async () => {
