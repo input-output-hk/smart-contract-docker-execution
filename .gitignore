@@ -2,6 +2,6 @@
 /dist
 /.nyc_output
 /coverage
-/src/lib/routes.ts
+/src/routes.ts
 docker/*
 !docker/README.md

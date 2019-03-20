@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && npm run api-build && tsc",
-    "dev": "nodemon -e ts -w ./src -x npm run dev:serve",
+    "dev": "npm run api-build && nodemon -e ts -w ./src -x npm run dev:serve",
     "dev:serve": "node --inspect -r dotenv/config -r ts-node/register -- src/index.ts",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint --fix \"src/**/*.ts\"",

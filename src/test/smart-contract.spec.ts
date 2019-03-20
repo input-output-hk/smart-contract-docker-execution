@@ -1,9 +1,9 @@
 import { expect } from 'chai'
-import { configureApi, bootApi } from '../lib/api'
+import { configureApi, bootApi } from '../api'
 import * as request from 'supertest'
 import { Server } from 'http'
 import { readFileSync } from 'fs'
-import { loadContainer, initializeDockerClient, findContainerId } from '../lib/docker-api'
+import { loadContainer, initializeDockerClient, findContainerId } from '../docker-api'
 const executable = readFileSync(`${__dirname}/../../test/smart_contract_server_mock/smart_contract_server_base64.txt`)
 
 describe('api', () => {
@@ -12,7 +12,7 @@ describe('api', () => {
   beforeEach(async () => {
     process.env.CONTAINER_LOWER_PORT_BOUND = '4200'
     process.env.CONTAINER_UPPER_PORT_BOUND = '4300'
-    app = await configureApi({ port: 4111 })
+    app = await configureApi().listen(4100)
   })
 
   afterEach(async () => {

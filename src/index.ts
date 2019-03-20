@@ -1,2 +1,2 @@
-import { bootApi } from './lib/api'
+import { bootApi } from './api'
 bootApi()

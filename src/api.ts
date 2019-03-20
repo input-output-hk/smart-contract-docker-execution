@@ -5,7 +5,7 @@ import { RegisterRoutes } from './routes'
 import './controllers/smart-contract'
 const swaggerUiAssetPath = require('swagger-ui-dist').getAbsoluteFSPath()
 
-export function configureApi ({ port }: { port: number }) {
+export function configureApi () {
   const app = express()
   app.use(bodyParser.json({ limit: '50mb' }))
   app.use('/documentation', express.static(swaggerUiAssetPath))
@@ -31,7 +31,7 @@ export function configureApi ({ port }: { port: number }) {
     res.status(500).json({ error: 'Internal Server Error' })
   })
 
-  return app.listen(port)
+  return app
 }
 
 export function bootApi () {
@@ -41,9 +41,15 @@ export function bootApi () {
     throw new Error('Missing environment config')
   }
 
-  configureApi({
-    port: Number(API_PORT)
+  const app = configureApi()
+  const server = app.listen(Number(API_PORT), (err: any) => {
+    if (err) {
+      throw new Error(`Unable to boot API on port ${API_PORT}`)
+    }
+
+    console.log(`Smart Contract Docker Engine listening on Port ${API_PORT}`)
   })
 
-  console.log(`Smart Contract Docker Engine listening on Port ${API_PORT}`)
+  const { address, port } = server.address().valueOf() as any
+  console.log(`API Documentation at ${address}:${port}/docs`)
 }
