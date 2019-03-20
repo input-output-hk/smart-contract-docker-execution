@@ -104,7 +104,7 @@ export async function loadContainer ({ executable, contractAddress, lowerPortBou
 
   await writeExecutable(executable, relativeExecutablePath)
   await writeDockerfile(relativeExecutablePath)
-  await buildImage(relativeDockerfilePath, `i-${contractAddress} `)
+  await buildImage(relativeDockerfilePath, `i-${contractAddress}`)
   await removeExecutable(relativeExecutablePath)
   return createContainer({ contractAddress, lowerPortBound, upperPortBound })
 }

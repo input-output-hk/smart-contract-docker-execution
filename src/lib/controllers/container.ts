@@ -13,7 +13,6 @@ interface LoadContainerRequest {
 
 interface UnloadContainerRequest {
   contractAddress: string
-  executable: string
 }
 
 interface ExecuteContractRequest {
@@ -43,6 +42,7 @@ export class ContainerController extends Controller {
   @Post('unloadContainer')
   public async unloadContainer (@Body() { contractAddress }: UnloadContainerRequest): Promise<void> {
     this.setStatus(204)
+    console.log(contractAddress)
     await unloadContainerService(contractAddress)
   }
 

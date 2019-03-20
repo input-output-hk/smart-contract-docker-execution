@@ -20,7 +20,15 @@ export function configureApi ({ port }: { port: number }) {
   RegisterRoutes(app)
 
   app.use(function (_req, res, _next) {
-    res.status(404).send({ error: 'Route not found' })
+    res.status(404).json({ error: 'Route not found' })
+  })
+
+  app.use(function (err: any, _req: any, res: any, _next: any) {
+    if (err.status === 400) {
+      return res.status(400).json({ error: err.fields })
+    }
+
+    res.status(500).json({ error: 'Internal Server Error' })
   })
 
   return app.listen(port)

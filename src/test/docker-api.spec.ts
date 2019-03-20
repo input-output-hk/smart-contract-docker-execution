@@ -14,10 +14,6 @@ describe('dockerApi', () => {
   describe('loadContainer', () => {
     it('successfully boots a container that accepts HTTP on the returned port', async () => {
       const { port } = await loadContainer({ executable: executable.toString(), contractAddress: 'abcd', lowerPortBound: 10000, upperPortBound: 11000 })
-        .catch(e => {
-          console.log(e.message)
-          throw e
-        })
 
       const result = await axios.post(`http://localhost:${port}`, {
         method: 'add',
