@@ -1,8 +1,8 @@
 import { Post, Route, Body, SuccessResponse, Controller } from 'tsoa'
 import axios from 'axios'
 import {
-  loadContainer as loadContainerService,
-  unloadContainer as unloadContainerService,
+  loadContainer,
+  unloadContainer,
   findContainerPort
 } from '../docker-api'
 
@@ -26,11 +26,11 @@ type SmartContractResponse = any
 @Route('')
 export class ContainerController extends Controller {
   @SuccessResponse('204', 'No Content')
-  @Post('loadContainer')
-  public async loadContainer (@Body() { contractAddress, executable }: LoadContainerRequest): Promise<void> {
+  @Post('loadSmartContract')
+  public async loadSmartContract (@Body() { contractAddress, executable }: LoadContainerRequest): Promise<void> {
     const { CONTAINER_LOWER_PORT_BOUND, CONTAINER_UPPER_PORT_BOUND } = process.env
     this.setStatus(204)
-    await loadContainerService({
+    await loadContainer({
       contractAddress,
       executable,
       lowerPortBound: Number(CONTAINER_LOWER_PORT_BOUND),
@@ -39,11 +39,10 @@ export class ContainerController extends Controller {
   }
 
   @SuccessResponse('204', 'No Content')
-  @Post('unloadContainer')
-  public async unloadContainer (@Body() { contractAddress }: UnloadContainerRequest): Promise<void> {
+  @Post('unloadSmartContract')
+  public async unloadSmartContract (@Body() { contractAddress }: UnloadContainerRequest): Promise<void> {
     this.setStatus(204)
-    console.log(contractAddress)
-    await unloadContainerService(contractAddress)
+    await unloadContainer(contractAddress)
   }
 
   @SuccessResponse('201', 'Created')

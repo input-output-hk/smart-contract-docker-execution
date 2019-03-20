@@ -28,10 +28,10 @@ describe('api', () => {
     })
   })
 
-  describe('/loadContainer', () => {
+  describe('/loadSmartContract', () => {
     it('creates a contract container with the correct name', () => {
       return request(app)
-        .post('/loadContainer')
+        .post('/loadSmartContract')
         .send({ contractAddress: 'abcd', executable: executable.toString() })
         .set('Accept', 'application/json')
         .expect(204)
@@ -43,7 +43,7 @@ describe('api', () => {
 
     it('throws a 400 if contract address is missing in the request body', () => {
       return request(app)
-        .post('/loadContainer')
+        .post('/loadSmartContract')
         .send({ executable: executable.toString() })
         .set('Accept', 'application/json')
         .expect(400)
@@ -51,19 +51,19 @@ describe('api', () => {
 
     it('throws a 400 if executable is missing in the request body', () => {
       return request(app)
-        .post('/loadContainer')
+        .post('/loadSmartContract')
         .send({ contractAddress: 'abcd' })
         .set('Accept', 'application/json')
         .expect(400)
     })
   })
 
-  describe('/unloadContainer', () => {
+  describe('/unloadSmartContract', () => {
     it('removes a contract container with the corresponding name', async () => {
       await loadContainer({ executable: executable.toString(), contractAddress: 'abcd', lowerPortBound: 10000, upperPortBound: 11000 })
 
       return request(app)
-        .post('/unloadContainer')
+        .post('/unloadSmartContract')
         .send({ contractAddress: 'abcd' })
         .set('Accept', 'application/json')
         .expect(204)
@@ -75,7 +75,7 @@ describe('api', () => {
 
     it('throws a 400 if contract address is missing in the request body', () => {
       return request(app)
-        .post('/unloadContainer')
+        .post('/unloadSmartContract')
         .send({})
         .set('Accept', 'application/json')
         .expect(400)

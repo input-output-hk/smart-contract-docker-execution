@@ -1,19 +1,19 @@
 # Smart Contract Docker Execution
 
-A service that orchestrates the creation of Docker containers from x86 smart contract bytecode, and the proxying of HTTP requests to these containers.
+A Docker-based execution engine compatible with off-chain Plutus x86 bytecode. The engine uses containers for isolated execution and routes incoming requests via the contract's HTTP interface.
 
-## Usage
+## API
 
-This service exposes an API that provides access to the following behaviour:
+For development, Swagger documentation is available at http://localhost:9000/docs
 
-### loadContainer
-Create a Docker container running a smart contract executable. The executable must be a base64-encoded x86 binary that exposes the Plutus smart contract HTTP interface.
+### loadSmartContract
+Load a smart contract executable. Must be a base64-encoded x86 binary that exposes the Plutus smart contract HTTP interface.
 
-### unloadContainer
-Kill a running Docker container, by contract address.
+### unloadSmartContract
+Kill a running smart contract container, by contract address.
 
 ### execute
-Call a specified smart contract container with method and arguments. If the container does not exist, an error is thrown that prompts the caller to first load the container.
+Call a loaded smart contract with method and arguments.
 
 ## Development
 

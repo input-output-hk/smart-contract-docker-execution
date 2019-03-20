@@ -2,7 +2,7 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import { RegisterRoutes } from './routes'
 
-import './controllers/container'
+import './controllers/smart-contract'
 const swaggerUiAssetPath = require('swagger-ui-dist').getAbsoluteFSPath()
 
 export function configureApi ({ port }: { port: number }) {
@@ -23,7 +23,7 @@ export function configureApi ({ port }: { port: number }) {
     res.status(404).json({ error: 'Route not found' })
   })
 
-  app.use(function (err: any, _req: any, res: any, _next: any) {
+  app.use(function (err: any, _req: any, res: any, _next: Function) {
     if (err.status === 400) {
       return res.status(400).json({ error: err.fields })
     }
