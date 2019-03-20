@@ -30,7 +30,7 @@ export async function buildImage (dockerfileRelativePath: string, imageName: str
 
   const buildOpts: any = {
     context: `${__dirname}/../..`,
-    src: ['dist', 'src']
+    src: ['docker']
   }
 
   let stream = await docker.buildImage(buildOpts, { t: imageName, dockerfile: dockerfileRelativePath })
@@ -99,14 +99,13 @@ export async function loadContainer ({ executable, contractAddress, lowerPortBou
   const containerRunning = (await findContainerId(contractAddress)).containerId
   if (containerRunning) return
 
-  const executablePath = `${__dirname}/${contractAddress}`
-  const relativeExecutablePath = executablePath.split('smart-contract-docker-execution/')[1]
+  const relativeExecutablePath = `docker/${contractAddress}`
   const relativeDockerfilePath = `${relativeExecutablePath}-Dockerfile`
 
-  await writeExecutable(executable, executablePath)
+  await writeExecutable(executable, relativeExecutablePath)
   await writeDockerfile(relativeExecutablePath)
   await buildImage(relativeDockerfilePath, `i-${contractAddress} `)
-  await removeExecutable(executablePath)
+  await removeExecutable(relativeExecutablePath)
   return createContainer({ contractAddress, lowerPortBound, upperPortBound })
 }
 

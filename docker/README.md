@@ -1,0 +1,1 @@
+Constrained build location for auto-generated dockerfiles and decoded binaries.

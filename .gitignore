@@ -3,3 +3,5 @@
 /.nyc_output
 /coverage
 /src/lib/routes.ts
+docker/*
+!docker/README.md
